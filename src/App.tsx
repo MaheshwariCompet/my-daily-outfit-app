@@ -29,7 +29,7 @@ export function App() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  // 1. Persistent User Wardrobe
+  // 1. Persistent User Wardrobe (strictly empty on first visit)
   const [clothes, setClothes] = useState<ClothingItem[]>(() => {
     const saved = localStorage.getItem('mydailyfit_real_clothes');
     if (saved) {
@@ -272,7 +272,7 @@ export function App() {
 
       <BottomNav clothesCount={clothes.length} />
 
-      {/* Modals */}
+      {/* Global Modals */}
       <UploadModal isOpen={isUploadModalOpen} onClose={() => setIsUploadModalOpen(false)} onAddItem={handleAddItem} />
       <LocationModal isOpen={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} weather={weather} onUpdateWeather={setWeather} />
       <ProfileModal isOpen={isProfileModalOpen} onClose={() => setIsProfileModalOpen(false)} profile={user} onUpdateProfile={() => showToast('Profile updated')} />

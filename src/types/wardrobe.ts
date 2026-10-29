@@ -5,6 +5,7 @@ export interface ClothingItem {
   id: string;
   title: string;
   category: ClothingCategory;
+  status: ClothingStatus;
   price: number;
   timesWorn: number;
   lastWornDate?: string;

@@ -27,6 +27,7 @@ export const StyleStatsScreen: React.FC<StyleStatsScreenProps> = ({ clothes, oot
   const outerPercent = totalItems > 0 ? Math.round((outerCount / totalItems) * 100) : 0;
   const shoesPercent = totalItems > 0 ? Math.round((shoesCount / totalItems) * 100) : 0;
 
+  // Real Cost Per Wear = Price / Max(timesWorn, 1)
   const rankedByCPW = [...clothes]
     .map((item) => {
       const wears = Math.max(item.timesWorn, 1);

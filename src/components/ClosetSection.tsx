@@ -42,8 +42,9 @@ export const ClosetSection: React.FC<ClosetSectionProps> = ({
 
   return (
     <div className="max-w-4xl mx-auto py-2 px-4 space-y-6">
+      {/* Top Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5 cursor-pointer">
           <h1 className="text-2xl font-black text-on-surface">Closet</h1>
           <ChevronDown className="w-5 h-5 text-secondary" />
         </div>
@@ -66,7 +67,7 @@ export const ClosetSection: React.FC<ClosetSectionProps> = ({
         </div>
       </div>
 
-      {/* Progress Reward Banner */}
+      {/* Reward Progress Banner */}
       <div className="bg-surface-container-low p-3.5 rounded-2xl border border-surface-container flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <span className="w-6 h-6 rounded-lg bg-primary text-white flex items-center justify-center text-xs font-bold">
@@ -81,7 +82,7 @@ export const ClosetSection: React.FC<ClosetSectionProps> = ({
         <span className="text-xs font-bold text-secondary">{items.length} Total</span>
       </div>
 
-      {/* Circular Action Navigation */}
+      {/* 5 Circular Action Navigation Buttons */}
       <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 text-center">
         <button onClick={() => navigate('/stats')} className="flex flex-col items-center gap-1.5 group">
           <div className="w-12 h-12 rounded-full bg-surface-container-lowest border border-surface-container flex items-center justify-center text-on-surface shadow-sm group-hover:scale-105 transition-transform">
@@ -128,9 +129,9 @@ export const ClosetSection: React.FC<ClosetSectionProps> = ({
         </button>
       </div>
 
-      {/* Sub-Closet Folders Grid */}
+      {/* Sub-Closet Folders Grid with 4-Item Cluster Previews */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-        {/* All Clothes Folder with dynamic 4-Item Preview */}
+        {/* All Clothes Folder */}
         <div
           onClick={() => setSelectedClosetId('all')}
           className={`p-4 rounded-3xl bg-surface-container-lowest border transition-all cursor-pointer ${
@@ -155,7 +156,7 @@ export const ClosetSection: React.FC<ClosetSectionProps> = ({
           <span className="text-xs text-secondary">{items.length} items</span>
         </div>
 
-        {/* Custom User Sub-Closets */}
+        {/* Custom Sub-Closet Folders */}
         {subClosets.filter(c => c.id !== 'all').map((closet) => {
           const closetItems = items.filter((i) => i.closetId === closet.id);
           return (
@@ -185,7 +186,7 @@ export const ClosetSection: React.FC<ClosetSectionProps> = ({
           );
         })}
 
-        {/* Create Sub-Closet Button */}
+        {/* Create Closet Card */}
         <div
           onClick={() => setShowCreateModal(true)}
           className="p-4 rounded-3xl border-2 border-dashed border-surface-container hover:border-primary/40 flex flex-col items-center justify-center text-center cursor-pointer min-h-[200px] transition-colors"
@@ -198,7 +199,7 @@ export const ClosetSection: React.FC<ClosetSectionProps> = ({
         </div>
       </div>
 
-      {/* Items Grid */}
+      {/* Items Gallery */}
       <div className="space-y-4 pt-4 border-t border-surface-container">
         <div className="flex items-center justify-between">
           <h3 className="font-extrabold text-sm text-on-surface">
@@ -268,7 +269,7 @@ export const ClosetSection: React.FC<ClosetSectionProps> = ({
         )}
       </div>
 
-      {/* Create Sub-Closet Dialog */}
+      {/* Create Sub-Closet Modal */}
       {showCreateModal && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
           <form onSubmit={handleCreateSubmit} className="bg-white rounded-3xl p-6 max-w-sm w-full space-y-4">
