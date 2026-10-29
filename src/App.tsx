@@ -6,193 +6,156 @@ import { HeroMorningGuide } from './components/HeroMorningGuide';
 import { MixMatchBuilder } from './components/MixMatchBuilder';
 import { FeatureGrid } from './components/FeatureGrid';
 import { ClosetSection } from './components/ClosetSection';
+import { StoreImportScreen } from './components/StoreImportScreen';
+import { StyleStatsScreen } from './components/StyleStatsScreen';
 import { PlannerSection } from './components/PlannerSection';
 import { InsightsSection } from './components/InsightsSection';
+import { AvatarConfigurator } from './components/AvatarConfigurator';
+import { TravelPackingAssistant } from './components/TravelPackingAssistant';
+import { LoginScreen, LogoutScreen } from './components/AuthScreens';
+import { SettingsScreen } from './components/SettingsScreen';
 import { UploadModal } from './components/UploadModal';
 import { LocationModal } from './components/LocationModal';
 import { ProfileModal } from './components/ProfileModal';
-import { INITIAL_CLOTHES, INITIAL_PRESETS, INITIAL_WEEK_PLAN } from './data/initialData';
-import { ClothingItem, MoodType, PresetOutfit, WeatherData, UserProfile, DayPlan } from './types/wardrobe';
-import { CheckCircle2 } from 'lucide-react';
+import { PaymentModal } from './components/PaymentModal';
+import { FillTheGapModal } from './components/FillTheGapModal';
+
+import { INITIAL_CLOTHES, INITIAL_SUB_CLOSETS, generateCurrentWeekPlan } from './data/initialData';
+import { ClothingItem, WeatherData, DayPlan, SubCloset } from './types/wardrobe';
+import { useAuth } from './context/AuthContext';
+import { CheckCircle2, Upload } from 'lucide-react';
 
 export function App() {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
-  // 1. Persistent Clothes State
+  // 1. Persistent User Wardrobe
   const [clothes, setClothes] = useState<ClothingItem[]>(() => {
-    const saved = localStorage.getItem('mydailyfit_clothes');
+    const saved = localStorage.getItem('mydailyfit_real_clothes');
     if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        console.error('Failed to parse saved clothes', e);
-      }
+      try { return JSON.parse(saved); } catch (e) { console.error(e); }
     }
     return INITIAL_CLOTHES;
   });
 
-  // 2. Persistent Week Plan State
+  // 2. Persistent Multi-Closet Sub-folders
+  const [subClosets, setSubClosets] = useState<SubCloset[]>(() => {
+    const saved = localStorage.getItem('mydailyfit_subclosets');
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) { console.error(e); }
+    }
+    return INITIAL_SUB_CLOSETS;
+  });
+
+  // 3. Dynamic 7-day schedule with real system dates
   const [weekPlan, setWeekPlan] = useState<DayPlan[]>(() => {
     const saved = localStorage.getItem('mydailyfit_weekplan');
     if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        console.error('Failed to parse saved week plan', e);
-      }
+      try { return JSON.parse(saved); } catch (e) { console.error(e); }
     }
-    return INITIAL_WEEK_PLAN;
+    return generateCurrentWeekPlan();
   });
 
-  // Sync to localStorage
   useEffect(() => {
-    localStorage.setItem('mydailyfit_clothes', JSON.stringify(clothes));
+    localStorage.setItem('mydailyfit_real_clothes', JSON.stringify(clothes));
   }, [clothes]);
+
+  useEffect(() => {
+    localStorage.setItem('mydailyfit_subclosets', JSON.stringify(subClosets));
+  }, [subClosets]);
 
   useEffect(() => {
     localStorage.setItem('mydailyfit_weekplan', JSON.stringify(weekPlan));
   }, [weekPlan]);
 
-  const [mood, setMood] = useState<MoodType>('energetic');
   const [isConfirmed, setIsConfirmed] = useState(false);
-
-  // Modals
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [isFillTheGapModalOpen, setIsFillTheGapModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Weather State
   const [weather, setWeather] = useState<WeatherData>({
-    city: 'Coimbatore',
-    temp: 78,
+    city: 'Local Area',
+    temp: 75,
     condition: 'Sunny',
-    note: 'Pleasant morning with gentle tropical breeze',
+    note: 'Clear skies with pleasant conditions',
     recommendation: 'Breathable Cotton / Light Layers',
   });
 
-  // Profile State
-  const [profile, setProfile] = useState<UserProfile>({
-    name: 'Priya Sharma',
-    email: 'priya@mydailyfit.local',
-    avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
-    isLoggedIn: true,
-  });
+  const userTops = clothes.filter((c) => c.category === 'Tops' || c.category === 'Outerwear');
+  const userBottoms = clothes.filter((c) => c.category === 'Bottoms');
+  
+  const [selectedTopId, setSelectedTopId] = useState<string>('');
+  const [selectedBottomId, setSelectedBottomId] = useState<string>('');
 
-  // Selected Outfit Pair for Today's Matched Pair
-  const [selectedTopId, setSelectedTopId] = useState<string>('top-2');
-  const [selectedBottomId, setSelectedBottomId] = useState<string>('bottom-1');
+  const selectedTop = clothes.find((c) => c.id === selectedTopId) || userTops[0];
+  const selectedBottom = clothes.find((c) => c.id === selectedBottomId) || userBottoms[0];
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
-    setTimeout(() => {
-      setToastMessage(null);
-    }, 3200);
-  };
-
-  const selectedTop = clothes.find((c) => c.id === selectedTopId) || clothes[0];
-  const selectedBottom = clothes.find((c) => c.id === selectedBottomId) || clothes.find((c) => c.category === 'Bottoms') || clothes[0];
-
-  const anchorItem = clothes.find((c) => c.id === 'top-1') || clothes[0];
-  const bottomOptions = clothes.filter((c) => c.category === 'Bottoms');
-
-  const handleConfirmLook = () => {
-    setIsConfirmed(true);
-    setWeekPlan((prev) =>
-      prev.map((d, i) => (i === 2 ? { ...d, topTitle: selectedTop.title, bottomTitle: selectedBottom.title, isConfirmed: true } : d))
-    );
-    showToast(`Confirmed! "${selectedTop.title} + ${selectedBottom.title}" is set for today.`);
-    setTimeout(() => setIsConfirmed(false), 3000);
-  };
-
-  const handleShuffleLook = () => {
-    const tops = clothes.filter((c) => c.category === 'Tops' || c.category === 'Outerwear');
-    const bottoms = clothes.filter((c) => c.category === 'Bottoms');
-    if (tops.length > 0 && bottoms.length > 0) {
-      const nextTop = tops[Math.floor(Math.random() * tops.length)];
-      const nextBottom = bottoms[Math.floor(Math.random() * bottoms.length)];
-      setSelectedTopId(nextTop.id);
-      setSelectedBottomId(nextBottom.id);
-      setIsConfirmed(false);
-      showToast(`Shuffled to ${nextTop.title} + ${nextBottom.title}`);
-    }
-  };
-
-  const handleGenerateCombo = () => {
-    handleShuffleLook();
-    navigate('/');
-    showToast('AI Outfit Generator created a new matching look for you!');
-  };
-
-  const handleToggleFavorite = (id: string) => {
-    setClothes((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, isFavorite: !item.isFavorite } : item
-      )
-    );
+    setTimeout(() => setToastMessage(null), 3000);
   };
 
   const handleAddItem = (newItem: ClothingItem) => {
     setClothes((prev) => [newItem, ...prev]);
-    showToast(`Added "${newItem.title}" to your closet!`);
+    showToast(`Added "${newItem.title}" to your wardrobe!`);
   };
 
   const handleDeleteItem = (id: string) => {
-    const itemToDelete = clothes.find((c) => c.id === id);
-    setClothes((prev) => prev.filter((item) => item.id !== id));
-    showToast(`Removed "${itemToDelete?.title || 'Garment'}" from your closet.`);
+    setClothes((prev) => prev.filter((i) => i.id !== id));
+    showToast('Garment deleted.');
   };
 
   const handleCycleStatus = (id: string) => {
     setClothes((prev) =>
-      prev.map((item) => {
-        if (item.id === id) {
-          const nextStatus =
-            item.status === 'Washed'
-              ? 'In Laundry'
-              : item.status === 'In Laundry'
-              ? 'Resting'
-              : 'Washed';
-          return { ...item, status: nextStatus };
+      prev.map((i) => {
+        if (i.id === id) {
+          const next = i.status === 'Washed' ? 'In Laundry' : 'Washed';
+          return { ...i, status: next };
         }
-        return item;
+        return i;
       })
     );
   };
 
-  const handleSelectPreset = (preset: PresetOutfit) => {
-    setSelectedTopId(preset.topId);
-    setSelectedBottomId(preset.bottomId);
+  const handleAddSubCloset = (name: string) => {
+    const newCloset: SubCloset = {
+      id: `closet-${Date.now()}`,
+      name,
+    };
+    setSubClosets((prev) => [...prev, newCloset]);
+    showToast(`Created closet: ${name}`);
+  };
+
+  const handleConfirmLook = () => {
+    if (!selectedTop || !selectedBottom) {
+      showToast('Upload a top and bottom first to log an outfit!');
+      return;
+    }
     setIsConfirmed(true);
-    setWeekPlan((prev) =>
-      prev.map((d, i) => (i === 2 ? { ...d, topTitle: preset.title, bottomTitle: 'Matching Preset', isConfirmed: true } : d))
-    );
-    navigate('/');
-    showToast(`Wearing "${preset.title}" today! Loaded into morning guide.`);
-  };
-
-  const handleSetForTomorrow = (item: ClothingItem) => {
-    setWeekPlan((prev) =>
-      prev.map((d, i) => {
-        if (i === 3) {
-          if (item.category === 'Bottoms') {
-            return { ...d, bottomTitle: item.title, isConfirmed: true };
-          }
-          return { ...d, topTitle: item.title, isConfirmed: true };
-        }
-        return d;
-      })
-    );
-    showToast(`Scheduled "${item.title}" for tomorrow (Thursday)! Check Outfit Planner.`);
-  };
-
-  const handleUpdateDayPlan = (dayIndex: number) => {
-    setWeekPlan((prev) =>
-      prev.map((day, idx) =>
-        idx === dayIndex ? { ...day, isConfirmed: !day.isConfirmed } : day
+    setClothes((prev) =>
+      prev.map((c) => 
+        c.id === selectedTop.id || c.id === selectedBottom.id 
+          ? { ...c, timesWorn: c.timesWorn + 1, lastWornDate: new Date().toISOString() } 
+          : c
       )
     );
-    showToast(`Updated status for ${weekPlan[dayIndex].dayName}!`);
+    showToast(`Logged "${selectedTop.title} + ${selectedBottom.title}" for today!`);
+    setTimeout(() => setIsConfirmed(false), 2500);
+  };
+
+  const handleShuffleLook = () => {
+    if (userTops.length === 0 || userBottoms.length === 0) {
+      showToast('Add tops and bottoms to your closet to shuffle pairings.');
+      return;
+    }
+    const nextTop = userTops[Math.floor(Math.random() * userTops.length)];
+    const nextBottom = userBottoms[Math.floor(Math.random() * userBottoms.length)];
+    setSelectedTopId(nextTop.id);
+    setSelectedBottomId(nextBottom.id);
+    showToast(`Shuffled to ${nextTop.title} + ${nextBottom.title}`);
   };
 
   return (
@@ -200,48 +163,62 @@ export function App() {
       <Header
         onOpenUploadModal={() => setIsUploadModalOpen(true)}
         onOpenProfileModal={() => setIsProfileModalOpen(true)}
+        onOpenPaymentModal={() => setIsPaymentModalOpen(true)}
         clothesCount={clothes.length}
-        profile={profile}
+        profile={user}
       />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <Routes>
           <Route
             path="/"
             element={
-              <div className="space-y-10 animate-fadeIn">
-                <HeroMorningGuide
-                  mood={mood}
-                  setMood={setMood}
-                  selectedTop={selectedTop}
-                  selectedBottom={selectedBottom}
-                  isConfirmed={isConfirmed}
-                  onConfirmLook={handleConfirmLook}
-                  onShuffleLook={handleShuffleLook}
-                  weather={weather}
-                  onOpenLocationModal={() => setIsLocationModalOpen(true)}
-                />
-
-                <MixMatchBuilder
-                  anchorItem={anchorItem}
-                  bottomOptions={bottomOptions}
-                />
-
-                <FeatureGrid onGenerateCombo={handleGenerateCombo} />
-              </div>
-            }
-          />
-
-          <Route
-            path="/planner"
-            element={
-              <div className="animate-fadeIn">
-                <PlannerSection
-                  weekPlan={weekPlan}
-                  presets={INITIAL_PRESETS}
-                  onSelectPreset={handleSelectPreset}
-                  onUpdateDayPlan={handleUpdateDayPlan}
-                />
+              <div className="space-y-8 animate-fadeIn">
+                {clothes.length === 0 ? (
+                  <div className="p-8 sm:p-12 rounded-3xl bg-surface-container-lowest border border-surface-container shadow-sm text-center space-y-4 max-w-xl mx-auto my-6">
+                    <div className="w-14 h-14 rounded-2xl bg-secondary-container text-primary flex items-center justify-center mx-auto">
+                      <Upload className="w-7 h-7" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold text-on-surface">Welcome to your MyDailyFit Wardrobe</h2>
+                      <p className="text-xs text-secondary mt-1 max-w-md mx-auto">
+                        This digital closet has zero placeholder items. Snap a picture of your clothes or import a past order to get started.
+                      </p>
+                    </div>
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-2 pt-2">
+                      <button
+                        onClick={() => setIsUploadModalOpen(true)}
+                        className="w-full sm:w-auto px-6 py-2.5 rounded-full bg-primary text-white text-xs font-bold shadow"
+                      >
+                        Upload First Clothes Photo
+                      </button>
+                      <button
+                        onClick={() => navigate('/store-import')}
+                        className="w-full sm:w-auto px-6 py-2.5 rounded-full bg-surface-container text-primary text-xs font-bold"
+                      >
+                        Import from Zara / Amazon
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <HeroMorningGuide
+                      mood="energetic"
+                      setMood={() => {}}
+                      selectedTop={selectedTop}
+                      selectedBottom={selectedBottom}
+                      isConfirmed={isConfirmed}
+                      onConfirmLook={handleConfirmLook}
+                      onShuffleLook={handleShuffleLook}
+                      weather={weather}
+                      onOpenLocationModal={() => setIsLocationModalOpen(true)}
+                    />
+                    {selectedTop && (
+                      <MixMatchBuilder anchorItem={selectedTop} bottomOptions={userBottoms} />
+                    )}
+                  </>
+                )}
+                <FeatureGrid onGenerateCombo={handleShuffleLook} />
               </div>
             }
           />
@@ -249,73 +226,59 @@ export function App() {
           <Route
             path="/closet"
             element={
-              <div className="animate-fadeIn">
-                <ClosetSection
-                  items={clothes}
-                  onToggleFavorite={handleToggleFavorite}
-                  onOpenUploadModal={() => setIsUploadModalOpen(true)}
-                  onDeleteItem={handleDeleteItem}
-                  onCycleStatus={handleCycleStatus}
-                />
-              </div>
+              <ClosetSection
+                items={clothes}
+                subClosets={subClosets}
+                onAddSubCloset={handleAddSubCloset}
+                onDeleteItem={handleDeleteItem}
+                onCycleStatus={handleCycleStatus}
+                onOpenUploadModal={() => setIsUploadModalOpen(true)}
+              />
             }
           />
 
           <Route
-            path="/insights"
+            path="/store-import"
+            element={<StoreImportScreen onAddItem={handleAddItem} activeClosetId="all" />}
+          />
+
+          <Route
+            path="/stats"
+            element={<StyleStatsScreen clothes={clothes} ootdCount={clothes.filter(c => c.timesWorn > 0).length} />}
+          />
+
+          <Route
+            path="/planner"
             element={
-              <div className="animate-fadeIn">
-                <InsightsSection
-                  clothes={clothes}
-                  onSetForTomorrow={handleSetForTomorrow}
-                />
-              </div>
+              <PlannerSection
+                weekPlan={weekPlan}
+                presets={[]}
+                onSelectPreset={() => {}}
+                onUpdateDayPlan={(idx) => {
+                  setWeekPlan((prev) => prev.map((d, i) => (i === idx ? { ...d, isConfirmed: !d.isConfirmed } : d)));
+                }}
+              />
             }
           />
+
+          <Route path="/avatar" element={<AvatarConfigurator clothes={clothes} />} />
+          <Route path="/travel" element={<TravelPackingAssistant clothes={clothes} />} />
+          <Route path="/insights" element={<InsightsSection clothes={clothes} onSetForTomorrow={(item) => showToast(`Scheduled ${item.title} for tomorrow!`)} />} />
+          <Route path="/login" element={<LoginScreen />} />
+          <Route path="/logout" element={<LogoutScreen />} />
+          <Route path="/settings" element={<SettingsScreen />} />
         </Routes>
       </main>
 
-      <footer className="mt-16 border-t border-surface-container bg-surface-container-lowest/50 py-8 hidden md:block">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-secondary">
-          <p>© 2026 MyDailyFit. Built for mindful capsule wardrobing and anti-stress morning styling.</p>
-          <div className="flex items-center gap-6">
-            <span>Location: {weather.city}</span>
-            <span>Real-time Dynamic Sync & Local Storage</span>
-          </div>
-        </div>
-      </footer>
-
-      {/* Bottom Nav for Mobile / Tablet Viewports */}
       <BottomNav clothesCount={clothes.length} />
 
       {/* Modals */}
-      <UploadModal
-        isOpen={isUploadModalOpen}
-        onClose={() => setIsUploadModalOpen(false)}
-        onAddItem={handleAddItem}
-      />
+      <UploadModal isOpen={isUploadModalOpen} onClose={() => setIsUploadModalOpen(false)} onAddItem={handleAddItem} />
+      <LocationModal isOpen={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} weather={weather} onUpdateWeather={setWeather} />
+      <ProfileModal isOpen={isProfileModalOpen} onClose={() => setIsProfileModalOpen(false)} profile={user} onUpdateProfile={() => showToast('Profile updated')} />
+      <PaymentModal isOpen={isPaymentModalOpen} onClose={() => setIsPaymentModalOpen(false)} onSuccessToast={showToast} />
+      <FillTheGapModal isOpen={isFillTheGapModalOpen} onClose={() => setIsFillTheGapModalOpen(false)} userClothes={clothes} onImportItem={handleAddItem} />
 
-      <LocationModal
-        isOpen={isLocationModalOpen}
-        onClose={() => setIsLocationModalOpen(false)}
-        weather={weather}
-        onUpdateWeather={(w) => {
-          setWeather(w);
-          showToast(`Location updated to ${w.city} (${w.temp}°F, ${w.condition})`);
-        }}
-      />
-
-      <ProfileModal
-        isOpen={isProfileModalOpen}
-        onClose={() => setIsProfileModalOpen(false)}
-        profile={profile}
-        onUpdateProfile={(p) => {
-          setProfile(p);
-          showToast(p.isLoggedIn ? `Welcome back, ${p.name}!` : 'Signed out as guest.');
-        }}
-      />
-
-      {/* Dynamic Toast Feedback */}
       {toastMessage && (
         <div className="fixed bottom-20 md:bottom-6 right-6 z-50 bg-on-surface text-surface px-5 py-3 rounded-full shadow-2xl flex items-center gap-2.5 text-xs font-semibold animate-slideUp">
           <CheckCircle2 className="w-4 h-4 text-emerald-400" />

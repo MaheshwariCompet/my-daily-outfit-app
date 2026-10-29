@@ -1,12 +1,13 @@
 import React from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { Logo } from './Logo';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, Sparkles } from 'lucide-react';
 import { UserProfile } from '../types/wardrobe';
 
 interface HeaderProps {
   onOpenUploadModal: () => void;
   onOpenProfileModal: () => void;
+  onOpenPaymentModal: () => void;
   clothesCount: number;
   profile: UserProfile;
 }
@@ -14,11 +15,12 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({
   onOpenUploadModal,
   onOpenProfileModal,
+  onOpenPaymentModal,
   clothesCount,
   profile,
 }) => {
   const getNavClass = ({ isActive }: { isActive: boolean }) =>
-    `px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
+    `px-4 py-2 rounded-full text-xs font-bold transition-all duration-200 whitespace-nowrap ${
       isActive
         ? 'bg-surface-container-lowest text-primary shadow-sm'
         : 'text-secondary hover:text-on-surface'
@@ -31,7 +33,8 @@ export const Header: React.FC<HeaderProps> = ({
           <Logo />
         </Link>
 
-        <nav className="hidden md:flex items-center gap-1.5 bg-surface-container-low p-1.5 rounded-full border border-surface-container">
+        {/* Desktop Navigation Links */}
+        <nav className="hidden lg:flex items-center gap-1 bg-surface-container-low p-1.5 rounded-full border border-surface-container">
           <NavLink to="/" end className={getNavClass}>
             Morning Guide
           </NavLink>
@@ -41,31 +44,56 @@ export const Header: React.FC<HeaderProps> = ({
           </NavLink>
 
           <NavLink to="/closet" className={getNavClass}>
-            <span className="flex items-center gap-2">
+            <span className="flex items-center gap-1.5">
               My Closet
-              <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-secondary-container text-secondary font-bold">
+              <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-secondary-container text-secondary font-bold">
                 {clothesCount}
               </span>
             </span>
           </NavLink>
 
+          <NavLink to="/avatar" className={getNavClass}>
+            3D Mannequin
+          </NavLink>
+
+          <NavLink to="/travel" className={getNavClass}>
+            Travel Capsule
+          </NavLink>
+
           <NavLink to="/insights" className={getNavClass}>
-            Insights & Habits
+            Insights
+          </NavLink>
+
+          <NavLink to="/settings" className={getNavClass}>
+            Settings
           </NavLink>
         </nav>
 
-        <div className="flex items-center gap-3">
+        {/* Action Buttons */}
+        <div className="flex items-center gap-2.5">
+          <button
+            onClick={onOpenPaymentModal}
+            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-bold shadow-sm transition-all ${
+              profile.isPro
+                ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                : 'bg-gradient-to-r from-primary to-primary-container text-white hover:opacity-95'
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5 text-emerald-300" />
+            <span>{profile.isPro ? 'Pro Active' : 'Upgrade Pro'}</span>
+          </button>
+
           <button
             onClick={onOpenUploadModal}
-            className="flex items-center gap-2 bg-primary hover:bg-primary-container text-white text-sm font-medium px-4 py-2.5 rounded-full shadow-sm hover:shadow active:scale-95 transition-all"
+            className="hidden sm:flex items-center gap-1.5 bg-secondary-container hover:bg-surface-container-highest text-primary text-xs font-bold px-3.5 py-2 rounded-full border border-secondary-container transition-all"
           >
             <PlusCircle className="w-4 h-4" />
-            <span className="hidden sm:inline">Add Clothes</span>
+            <span>Add Garment</span>
           </button>
 
           <button
             onClick={onOpenProfileModal}
-            title={profile.isLoggedIn ? `Logged in as ${profile.name}` : 'Login / Profile'}
+            title={profile.isLoggedIn ? `Signed in as ${profile.name}` : 'Login'}
             className="flex items-center gap-2 pl-2 border-l border-surface-container focus:outline-none group"
           >
             <div className="relative">

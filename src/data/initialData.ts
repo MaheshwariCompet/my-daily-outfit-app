@@ -1,188 +1,32 @@
-import { ClothingItem, PresetOutfit, DayPlan } from '../types/wardrobe';
+import { ClothingItem, SubCloset, DayPlan } from '../types/wardrobe';
 
-export const INITIAL_CLOTHES: ClothingItem[] = [
-  {
-    id: 'top-1',
-    title: 'Relaxed Sand Overshirt',
-    category: 'Outerwear',
-    subtitle: 'Organic cotton weave',
-    status: 'Washed',
-    timesWorn: 14,
-    lastWornDaysAgo: 2,
-    isFavorite: true,
-    isBulkyOrStored: false,
-    imageUrl: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=700&q=80',
-  },
-  {
-    id: 'top-2',
-    title: 'Oatmeal Heather Knit',
-    category: 'Tops',
-    subtitle: 'Merino wool blend',
-    status: 'Washed',
-    timesWorn: 18,
-    lastWornDaysAgo: 1,
-    isFavorite: true,
-    isBulkyOrStored: false,
-    imageUrl: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=700&q=80',
-  },
-  {
-    id: 'top-3',
-    title: 'Classic White T-Shirt',
-    category: 'Tops',
-    subtitle: '100% Pima cotton',
-    status: 'Washed',
-    timesWorn: 24,
-    lastWornDaysAgo: 4,
-    isFavorite: true,
-    isBulkyOrStored: false,
-    imageUrl: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=700&q=80',
-  },
-  {
-    id: 'top-4',
-    title: 'Blue Oxford Button-Down',
-    category: 'Tops',
-    subtitle: 'Crisp everyday fit',
-    status: 'Washed',
-    timesWorn: 11,
-    lastWornDaysAgo: 6,
-    isFavorite: false,
-    isBulkyOrStored: false,
-    imageUrl: 'https://images.unsplash.com/photo-1598033129183-c4f50c736f10?auto=format&fit=crop&w=700&q=80',
-  },
-  {
-    id: 'bottom-1',
-    title: 'Dark Pleated Chinos',
-    category: 'Bottoms',
-    subtitle: 'Water repellent twill',
-    status: 'Washed',
-    timesWorn: 19,
-    lastWornDaysAgo: 1,
-    isFavorite: true,
-    isBulkyOrStored: false,
-    imageUrl: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=700&q=80',
-  },
-  {
-    id: 'bottom-2',
-    title: 'Navy Utility Work Pants',
-    category: 'Bottoms',
-    subtitle: 'Classic contrast fit',
-    status: 'Washed',
-    timesWorn: 16,
-    lastWornDaysAgo: 3,
-    isFavorite: true,
-    isBulkyOrStored: false,
-    imageUrl: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=700&q=80',
-  },
-  {
-    id: 'bottom-3',
-    title: 'Khaki Relaxed Chinos',
-    category: 'Bottoms',
-    subtitle: 'Tonal everyday neutral',
-    status: 'Washed',
-    timesWorn: 12,
-    lastWornDaysAgo: 5,
-    isFavorite: false,
-    isBulkyOrStored: false,
-    imageUrl: 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=700&q=80',
-  },
-  {
-    id: 'bottom-4',
-    title: 'Selvedge Denim Jeans',
-    category: 'Bottoms',
-    subtitle: 'Indigo 14oz rigid raw',
-    status: 'Washed',
-    timesWorn: 22,
-    lastWornDaysAgo: 2,
-    isFavorite: true,
-    isBulkyOrStored: false,
-    imageUrl: 'https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&w=700&q=80',
-  },
-  {
-    id: 'forgotten-1',
-    title: 'Pastel Mustard Yellow Polo',
-    category: 'Tops',
-    subtitle: 'Soft waffle knit polo',
-    status: 'Resting',
-    timesWorn: 2,
-    lastWornDaysAgo: 74,
-    isFavorite: false,
-    isBulkyOrStored: true,
-    imageUrl: 'https://images.unsplash.com/photo-1581655353564-df123a1eb820?auto=format&fit=crop&w=700&q=80',
-  },
-  {
-    id: 'forgotten-2',
-    title: 'Field Green Chore Jacket',
-    category: 'Outerwear',
-    subtitle: 'Heavy canvas utility',
-    status: 'Resting',
-    timesWorn: 3,
-    lastWornDaysAgo: 89,
-    isFavorite: false,
-    isBulkyOrStored: true,
-    imageUrl: 'https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=700&q=80',
-  },
-  {
-    id: 'forgotten-3',
-    title: 'Rugged Brown Leather Boots',
-    category: 'Shoes',
-    subtitle: 'Handcrafted Goodyear welt',
-    status: 'Resting',
-    timesWorn: 5,
-    lastWornDaysAgo: 62,
-    isFavorite: false,
-    isBulkyOrStored: true,
-    imageUrl: 'https://images.unsplash.com/photo-1520639888713-7851133b1ed0?auto=format&fit=crop&w=700&q=80',
-  },
-  {
-    id: 'laundry-1',
-    title: 'Charcoal Merino Cardigan',
-    category: 'Outerwear',
-    subtitle: 'Natural horn buttons',
-    status: 'In Laundry',
-    timesWorn: 9,
-    lastWornDaysAgo: 0,
-    isFavorite: false,
-    isBulkyOrStored: false,
-    imageUrl: 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?auto=format&fit=crop&w=700&q=80',
+export const INITIAL_CLOTHES: ClothingItem[] = [];
+
+export const INITIAL_SUB_CLOSETS: SubCloset[] = [
+  { id: 'all', name: 'All Clothes' },
+  { id: 'winter', name: 'Winter items' }
+];
+
+export const generateCurrentWeekPlan = (): DayPlan[] => {
+  const now = new Date();
+  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const week: DayPlan[] = [];
+
+  const currentDayOfWeek = now.getDay();
+  const startOfWeek = new Date(now);
+  // Set to current Monday
+  const distanceToMonday = currentDayOfWeek === 0 ? -6 : 1 - currentDayOfWeek;
+  startOfWeek.setDate(now.getDate() + distanceToMonday);
+
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(startOfWeek);
+    d.setDate(startOfWeek.getDate() + i);
+    week.push({
+      dayName: dayNames[d.getDay()],
+      dateNumber: d.getDate(),
+      fullDate: d.toISOString().split('T')[0],
+      isConfirmed: false,
+    });
   }
-];
-
-export const INITIAL_PRESETS: PresetOutfit[] = [
-  {
-    id: 'preset-1',
-    title: 'Monday Easy Set',
-    tag: 'Ready',
-    vibe: 'Crisp • Relaxed',
-    imageUrl: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=600&q=80',
-    topId: 'top-3',
-    bottomId: 'bottom-2'
-  },
-  {
-    id: 'preset-2',
-    title: 'Rainy Day Chill',
-    tag: 'Warm',
-    vibe: 'Soft • Comfy',
-    imageUrl: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=600&q=80',
-    topId: 'top-2',
-    bottomId: 'bottom-1'
-  },
-  {
-    id: 'preset-3',
-    title: 'Friday Clean Look',
-    tag: 'Clean',
-    vibe: 'Smart • Polished',
-    imageUrl: 'https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?auto=format&fit=crop&w=600&q=80',
-    topId: 'top-1',
-    bottomId: 'bottom-3'
-  }
-];
-
-export const INITIAL_WEEK_PLAN: DayPlan[] = [
-  { dayName: 'Mon', dateNumber: 21, topTitle: 'Classic White T-Shirt', bottomTitle: 'Navy Utility Work Pants', isConfirmed: true },
-  { dayName: 'Tue', dateNumber: 22, topTitle: 'Blue Oxford Button-Down', bottomTitle: 'Dark Pleated Chinos', isConfirmed: true },
-  { dayName: 'Wed', dateNumber: 23, topTitle: 'Oatmeal Heather Knit', bottomTitle: 'Dark Pleated Chinos', isConfirmed: true },
-  { dayName: 'Thu', dateNumber: 24, topTitle: 'Relaxed Sand Overshirt', bottomTitle: 'Khaki Relaxed Chinos', isConfirmed: false },
-  { dayName: 'Fri', dateNumber: 25, topTitle: 'Blue Oxford Button-Down', bottomTitle: 'Selvedge Denim Jeans', isConfirmed: false },
-  { dayName: 'Sat', dateNumber: 26, topTitle: 'Classic White T-Shirt', bottomTitle: 'Khaki Relaxed Chinos', isConfirmed: false },
-  { dayName: 'Sun', dateNumber: 27, topTitle: 'Oatmeal Heather Knit', bottomTitle: 'Navy Utility Work Pants', isConfirmed: false },
-];
+  return week;
+};

@@ -1,49 +1,49 @@
 export type ClothingStatus = 'Washed' | 'In Laundry' | 'Resting';
-export type ClothingCategory = 'Tops' | 'Bottoms' | 'Outerwear' | 'Shoes';
-export type MoodType = 'tired' | 'energetic' | 'ready';
+export type ClothingCategory = 'Tops' | 'Bottoms' | 'Outerwear' | 'Shoes' | 'Accessories';
 
 export interface ClothingItem {
   id: string;
   title: string;
   category: ClothingCategory;
-  subtitle: string;
-  status: ClothingStatus;
+  price: number;
   timesWorn: number;
-  lastWornDaysAgo: number;
+  lastWornDate?: string;
   imageUrl: string;
+  closetId: string;
+  importedFrom?: 'Amazon' | 'Zara' | 'Shein' | 'ASOS' | 'Gmail' | 'Manual';
   isFavorite: boolean;
-  isBulkyOrStored?: boolean;
+  notes?: string;
 }
 
-export interface PresetOutfit {
+export interface SubCloset {
   id: string;
-  title: string;
-  tag: string;
-  vibe: string;
-  imageUrl: string;
-  topId: string;
-  bottomId: string;
+  name: string;
+  coverImage?: string;
 }
 
 export interface DayPlan {
   dayName: string;
   dateNumber: number;
-  topTitle: string;
-  bottomTitle: string;
+  fullDate: string;
+  topId?: string;
+  bottomId?: string;
   isConfirmed: boolean;
-}
-
-export interface WeatherData {
-  city: string;
-  temp: number;
-  condition: 'Rainy' | 'Sunny' | 'Cold' | 'Windy';
-  note: string;
-  recommendation: string;
 }
 
 export interface UserProfile {
   name: string;
   email: string;
-  avatarUrl: string;
+  avatarUrl?: string;
   isLoggedIn: boolean;
+  isPro: boolean;
+  connectedGmail: boolean;
+  connectedCalendar: boolean;
+}
+
+export interface WeatherData {
+  city: string;
+  temp: number;
+  condition: 'Sunny' | 'Rainy' | 'Cold' | 'Windy';
+  note: string;
+  recommendation: string;
 }

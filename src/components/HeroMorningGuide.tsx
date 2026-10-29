@@ -27,16 +27,11 @@ export const HeroMorningGuide: React.FC<HeroMorningGuideProps> = ({
 }) => {
   const getWeatherIcon = () => {
     switch (weather.condition) {
-      case 'Rainy':
-        return <CloudRain className="w-5 h-5" />;
-      case 'Sunny':
-        return <CloudSun className="w-5 h-5" />;
-      case 'Cold':
-        return <Snowflake className="w-5 h-5" />;
-      case 'Windy':
-        return <Wind className="w-5 h-5" />;
-      default:
-        return <CloudRain className="w-5 h-5" />;
+      case 'Rainy': return <CloudRain className="w-5 h-5" />;
+      case 'Sunny': return <CloudSun className="w-5 h-5" />;
+      case 'Cold': return <Snowflake className="w-5 h-5" />;
+      case 'Windy': return <Wind className="w-5 h-5" />;
+      default: return <CloudRain className="w-5 h-5" />;
     }
   };
 

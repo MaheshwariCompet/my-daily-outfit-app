@@ -5,7 +5,7 @@ interface LogoProps {
   showText?: boolean;
 }
 
-export const Logo: React.FC<LogoProps> = ({ className = 'h-8 w-auto', showText = true }) => {
+export const Logo: React.FC<LogoProps> = ({ showText = true }) => {
   return (
     <div className="flex items-center gap-3 cursor-pointer group select-none">
       <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-surface-container-low border border-primary/10 shadow-sm group-hover:border-primary/30 transition-all duration-300">
